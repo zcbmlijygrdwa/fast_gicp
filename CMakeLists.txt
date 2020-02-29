@@ -7,8 +7,6 @@ set(CMAKE_CXX_FLAGS "-msse -msse2 -msse3 -msse4 -msse4.1 -msse4.2")
 
 set(CMAKE_BUILD_TYPE "Release")
 
-find_package(catkin REQUIRED)
-
 find_package(PCL REQUIRED)
 find_package(Eigen3 REQUIRED)
 
@@ -24,16 +22,6 @@ if(CUDA_FOUND)
   include_directories(${CUDA_INCLUDE_DIRS})
   link_directories(${CUDA_LIBRARY_DIRS})
 endif()
-
-###################################
-## catkin specific configuration ##
-###################################
-catkin_package(
-  INCLUDE_DIRS include thirdparty/Sophus
-  LIBRARIES fast_gicp
-#  CATKIN_DEPENDS other_catkin_pkg
-#  DEPENDS system_lib
-)
 
 ###########
 ## Build ##
@@ -54,13 +42,11 @@ target_include_directories(fast_gicp PUBLIC
   thirdparty/Sophus
   ${PCL_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIR}
-  ${catkin_INCLUDE_DIRS}
 )
 
 add_executable(gicp_align src/align.cpp)
-add_dependencies(gicp_align ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(gicp_align fast_gicp)
 target_link_libraries(gicp_align
-  ${catkin_LIBRARIES}
   ${PCL_LIBRARIES}
   fast_gicp
 )
