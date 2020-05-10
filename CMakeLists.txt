@@ -4,7 +4,7 @@ project(fast_gicp)
 add_definitions(-msse -msse2 -msse3 -msse4 -msse4.1 -msse4.2)
 set(CMAKE_C_FLAGS "-msse -msse2 -msse3 -msse4 -msse4.1 -msse4.2")
 set(CMAKE_CXX_FLAGS "-msse -msse2 -msse3 -msse4 -msse4.1 -msse4.2")
-set(CMAKE_CXX_FLAGS "#{CMAKE_CXX_FLAGS} -std-c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std-c++11")
 
 set(CMAKE_BUILD_TYPE "Release")
 
