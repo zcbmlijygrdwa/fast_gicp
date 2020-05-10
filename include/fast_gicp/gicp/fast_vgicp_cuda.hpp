@@ -47,6 +47,7 @@ public:
   using pcl::Registration<PointSource, PointTarget, Scalar>::transformation_epsilon_;
   using pcl::Registration<PointSource, PointTarget, Scalar>::converged_;
   using pcl::Registration<PointSource, PointTarget, Scalar>::corr_dist_threshold_;
+  using pcl::Registration<PointSource, PointTarget, Scalar>::correspondences_;
 
   FastVGICPCuda();
   virtual ~FastVGICPCuda() override;
@@ -66,6 +67,41 @@ public:
   void clearSource();
 
   void clearTarget();
+
+  pcl::Correspondences getCorrespondencesVec()
+  {
+      //compare transformed source with target to get correspondence
+      boost::shared_ptr<pcl::Correspondences> correspondences (new pcl::Correspondences);
+      pcl::registration::CorrespondenceEstimation<PointSource, PointTarget> corr_est;
+      PointCloudSourcePtr transformed_source(new PointCloudSource());
+      pcl::transformPointCloud(*input_, *transformed_source, final_transformation_);
+      corr_est.setInputCloud(transformed_source);
+      corr_est.setInputTarget(target_);
+      double max_correspondence_distance = 0.1;
+      corr_est.determineCorrespondences (*correspondences, max_correspondence_distance);
+      *correspondences_ = *correspondences;
+      return *correspondences_;
+  }
+
+  PointCloudSourcePtr getSourcePointCloudCorrespondences()
+  {
+      PointCloudSourcePtr source_pc_corr(new PointCloudSource());
+      for(int i = 0 ; i < correspondences_->size() ; ++i)
+      {
+          source_pc_corr->points.push_back(input_->points[(*correspondences_)[i].index_query]);
+      }
+      return source_pc_corr;
+  }
+
+  PointCloudTargetPtr getTargetPointCloudCorrespondences()
+  {
+      PointCloudTargetPtr target_pc_corr(new PointCloudTarget());
+      for(int i = 0 ; i < correspondences_->size() ; ++i)
+      {
+          target_pc_corr->points.push_back(target_->points[(*correspondences_)[i].index_match]);
+      }
+      return target_pc_corr;
+  }
 
   virtual void setInputSource(const PointCloudSourceConstPtr& cloud) override;
 
